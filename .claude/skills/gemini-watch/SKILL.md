@@ -30,7 +30,7 @@ Leave out `--prompt` to get the default: summary, timestamped steps, on-screen-o
 
 ## Setup
 
-- Key: `GEMINI_API_KEY` (or `GOOGLE_API_KEY`), in the environment or in `~/.config/gemini/.env`. Free at https://aistudio.google.com/apikey.
+- Key: free at https://aistudio.google.com/apikey. Set it as `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in the environment or in `~/.config/gemini/.env`. In a Claude Code cloud environment, you can instead save it as a network secret for `generativelanguage.googleapis.com` with header `x-goog-api-key`; with no local key, the script sends a placeholder that the proxy replaces.
 - If the key is missing, tell the user where to get one. Never ask them to paste it into chat. In a cloud session, have them save it as an environment secret or variable.
 - Only public or unlisted YouTube videos work. Private videos fail.
 

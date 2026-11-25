@@ -86,12 +86,9 @@ def video_part(source: str, start: str | None, end: str | None, fps: float | Non
 
 
 def ask(source: str, prompt: str, model: str, start=None, end=None, fps=None) -> str:
-    key = load_key()
-    if not key:
-        raise SystemExit(
-            "No GEMINI_API_KEY found. Get a free key at https://aistudio.google.com/apikey and set it "
-            "as GEMINI_API_KEY (environment) or in ~/.config/gemini/.env."
-        )
+    # With no local key, send a placeholder: in Claude Code cloud environments a
+    # network secret on this host makes the proxy replace the header with the real key.
+    key = load_key() or "proxy-injected"
     body = json.dumps({
         "contents": [{"parts": [video_part(source, start, end, fps), {"text": prompt}]}],
     }).encode()
@@ -110,6 +107,12 @@ def ask(source: str, prompt: str, model: str, start=None, end=None, fps=None) ->
                 print(f"[gemini-watch] HTTP {exc.code}, retrying in {delay}s", file=sys.stderr)
                 time.sleep(delay)
                 continue
+            if "API_KEY_INVALID" in detail or exc.code in (401, 403) and "key" in detail.lower():
+                raise SystemExit(
+                    "Gemini rejected the API key (or none is configured). Get a free key at "
+                    "https://aistudio.google.com/apikey and set GEMINI_API_KEY, or save it as a "
+                    "network secret for generativelanguage.googleapis.com (header x-goog-api-key)."
+                )
             raise SystemExit(f"Gemini request failed: HTTP {exc.code}: {detail}")
 
     candidates = data.get("candidates") or []
